@@ -44,3 +44,7 @@ The site is deployed via GitHub Pages from the `main` branch. Push to `main` to 
 - Single-file static site (HTML, CSS, JavaScript)
 - No dependencies or build step
 - Dark theme with responsive layout
+
+---
+
+caleb was here
