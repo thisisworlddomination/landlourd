@@ -20,8 +20,12 @@
     .search-bar button { padding: 0.75rem 1.5rem; border-radius: 8px; border: none; background: #3b82f6; color: white; font-size: 1rem; cursor: pointer; font-weight: 600; transition: background 0.2s; }
     .search-bar button:hover { background: #2563eb; }
 
-    .filters { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .toolbar { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; align-items: center; }
+    .filters { display: flex; gap: 0.5rem; flex-wrap: wrap; flex: 1; }
     .filters select { padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid #475569; background: #1e293b; color: #cbd5e1; font-size: 0.875rem; cursor: pointer; outline: none; }
+
+    .btn-add { padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid #22c55e; background: transparent; color: #22c55e; font-size: 0.875rem; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+    .btn-add:hover { background: #22c55e; color: #0f172a; }
 
     .results-count { color: #94a3b8; font-size: 0.875rem; margin-bottom: 1rem; }
 
@@ -67,13 +71,35 @@
     .review-date { color: #64748b; font-size: 0.8rem; }
     .review-text { color: #94a3b8; font-size: 0.875rem; line-height: 1.4; }
 
+    .modal-actions { display: flex; gap: 0.5rem; margin-top: 1rem; }
+    .btn-edit { padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid #3b82f6; background: transparent; color: #3b82f6; font-size: 0.875rem; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+    .btn-edit:hover { background: #3b82f6; color: white; }
+    .btn-delete { padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid #ef4444; background: transparent; color: #ef4444; font-size: 0.875rem; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+    .btn-delete:hover { background: #ef4444; color: white; }
+
     .empty-state { text-align: center; padding: 3rem 1rem; color: #64748b; }
     .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; }
+
+    /* Form modal */
+    .form-modal { background: #1e293b; border: 1px solid #475569; border-radius: 16px; max-width: 550px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 2rem; position: relative; }
+    .form-modal h2 { font-size: 1.3rem; margin-bottom: 1.25rem; color: #f1f5f9; }
+    .form-group { margin-bottom: 0.75rem; }
+    .form-group label { display: block; color: #94a3b8; font-size: 0.8rem; margin-bottom: 0.25rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: #f1f5f9; font-size: 0.9rem; outline: none; font-family: inherit; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #3b82f6; }
+    .form-group textarea { resize: vertical; min-height: 60px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .form-actions { display: flex; gap: 0.5rem; margin-top: 1rem; justify-content: flex-end; }
+    .btn-save { padding: 0.6rem 1.25rem; border-radius: 6px; border: none; background: #3b82f6; color: white; font-size: 0.9rem; cursor: pointer; font-weight: 600; }
+    .btn-save:hover { background: #2563eb; }
+    .btn-cancel { padding: 0.6rem 1.25rem; border-radius: 6px; border: 1px solid #475569; background: transparent; color: #94a3b8; font-size: 0.9rem; cursor: pointer; }
+    .btn-cancel:hover { border-color: #94a3b8; }
 
     @media (max-width: 600px) {
       .card-details { grid-template-columns: 1fr; }
       .modal-grid { grid-template-columns: 1fr; }
       .search-bar { flex-direction: column; }
+      .form-row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -89,196 +115,111 @@
     <input type="text" id="searchInput" placeholder="Search by name, address, or borough..." autofocus>
     <button onclick="doSearch()">Search</button>
   </div>
-  <div class="filters">
-    <select id="filterBorough" onchange="doSearch()">
-      <option value="">All Boroughs</option>
-      <option value="Manhattan">Manhattan</option>
-      <option value="Brooklyn">Brooklyn</option>
-      <option value="Queens">Queens</option>
-      <option value="Bronx">Bronx</option>
-      <option value="Staten Island">Staten Island</option>
-    </select>
-    <select id="filterRating" onchange="doSearch()">
-      <option value="">Any Rating</option>
-      <option value="4">4+ Stars</option>
-      <option value="3">3+ Stars</option>
-      <option value="2">2+ Stars</option>
-      <option value="1">1+ Stars</option>
-    </select>
-    <select id="filterSort" onchange="doSearch()">
-      <option value="rating-desc">Highest Rated</option>
-      <option value="rating-asc">Lowest Rated</option>
-      <option value="name">Name A-Z</option>
-      <option value="properties">Most Properties</option>
-    </select>
+  <div class="toolbar">
+    <div class="filters">
+      <select id="filterBorough" onchange="doSearch()">
+        <option value="">All Boroughs</option>
+        <option value="Manhattan">Manhattan</option>
+        <option value="Brooklyn">Brooklyn</option>
+        <option value="Queens">Queens</option>
+        <option value="Bronx">Bronx</option>
+        <option value="Staten Island">Staten Island</option>
+      </select>
+      <select id="filterRating" onchange="doSearch()">
+        <option value="">Any Rating</option>
+        <option value="4">4+ Stars</option>
+        <option value="3">3+ Stars</option>
+        <option value="2">2+ Stars</option>
+        <option value="1">1+ Stars</option>
+      </select>
+      <select id="filterSort" onchange="doSearch()">
+        <option value="rating-desc">Highest Rated</option>
+        <option value="rating-asc">Lowest Rated</option>
+        <option value="name">Name A-Z</option>
+        <option value="properties">Most Properties</option>
+      </select>
+    </div>
+    <button class="btn-add" onclick="openForm()">+ Add Landlord</button>
   </div>
   <div class="results-count" id="resultsCount"></div>
   <div id="results"></div>
 </div>
 
+<!-- Detail modal -->
 <div class="modal-overlay" id="modal" onclick="closeModal(event)">
   <div class="modal" id="modalContent"></div>
 </div>
 
+<!-- Form modal -->
+<div class="modal-overlay" id="formModal" onclick="closeFormModal(event)">
+  <div class="form-modal">
+    <h2 id="formTitle">Add Landlord</h2>
+    <input type="hidden" id="formId">
+    <div class="form-row">
+      <div class="form-group"><label>Name</label><input type="text" id="fName" placeholder="Company name"></div>
+      <div class="form-group"><label>Owner</label><input type="text" id="fOwner" placeholder="Owner name"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Borough</label>
+        <select id="fBorough">
+          <option value="Manhattan">Manhattan</option>
+          <option value="Brooklyn">Brooklyn</option>
+          <option value="Queens">Queens</option>
+          <option value="Bronx">Bronx</option>
+          <option value="Staten Island">Staten Island</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Zip</label><input type="text" id="fZip" placeholder="10001"></div>
+    </div>
+    <div class="form-group"><label>Address</label><input type="text" id="fAddress" placeholder="123 Main St"></div>
+    <div class="form-row">
+      <div class="form-group"><label>Phone</label><input type="text" id="fPhone" placeholder="(212) 555-0000"></div>
+      <div class="form-group"><label>Email</label><input type="email" id="fEmail" placeholder="contact@example.com"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Properties</label><input type="number" id="fProperties" value="0"></div>
+      <div class="form-group"><label>Units</label><input type="number" id="fUnits" value="0"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Avg Rent</label><input type="text" id="fAvgRent" placeholder="$2,000"></div>
+      <div class="form-group"><label>Registered Year</label><input type="text" id="fRegistered" placeholder="2020"></div>
+    </div>
+    <div class="form-group"><label>Tags (comma-separated)</label><input type="text" id="fTags" placeholder="responsive, well-maintained"></div>
+    <div class="form-actions">
+      <button class="btn-cancel" onclick="closeFormModal()">Cancel</button>
+      <button class="btn-save" onclick="saveForm()">Save</button>
+    </div>
+  </div>
+</div>
+
 <script>
-const landlords = [
-  {
-    id: 1, name: "Greenfield Properties LLC", owner: "David Greenfield",
-    borough: "Manhattan", address: "450 W 42nd St", zip: "10036",
-    properties: 23, units: 312, rating: 4.2, reviews: 87,
-    tags: ["responsive", "well-maintained"],
-    phone: "(212) 555-0142", email: "info@greenfieldprop.com", registered: "2008",
-    violations: 12, openViolations: 2, avgRent: "$2,850",
-    reviewList: [
-      { author: "Sarah M.", date: "2026-02-14", stars: 5, text: "Great landlord. Maintenance requests handled within 24 hours. Building is always clean." },
-      { author: "James K.", date: "2026-01-03", stars: 4, text: "Generally good experience. Rent increases are reasonable. Lobby could use updating." },
-      { author: "Priya R.", date: "2025-11-20", stars: 3, text: "Decent management but slow to respond during holidays. Otherwise fine." }
-    ]
-  },
-  {
-    id: 2, name: "BK Living Management", owner: "Rachel Torres",
-    borough: "Brooklyn", address: "789 Atlantic Ave", zip: "11238",
-    properties: 15, units: 198, rating: 3.1, reviews: 124,
-    tags: ["slow-repairs", "affordable"],
-    phone: "(718) 555-0267", email: "contact@bkliving.com", registered: "2012",
-    violations: 45, openViolations: 8, avgRent: "$2,100",
-    reviewList: [
-      { author: "Mike D.", date: "2026-03-01", stars: 2, text: "Took 3 weeks to fix a leak in the bathroom. Communication is poor." },
-      { author: "Aisha L.", date: "2026-01-18", stars: 4, text: "Rent is fair for the area. The building is older but livable." },
-      { author: "Tom W.", date: "2025-12-05", stars: 3, text: "Average experience. Nothing terrible but nothing great either." }
-    ]
-  },
-  {
-    id: 3, name: "Crown Heights Realty Group", owner: "Marcus Johnson",
-    borough: "Brooklyn", address: "1200 Eastern Pkwy", zip: "11213",
-    properties: 8, units: 64, rating: 4.7, reviews: 42,
-    tags: ["responsive", "pet-friendly", "well-maintained"],
-    phone: "(718) 555-0391", email: "marcus@chrg.nyc", registered: "2015",
-    violations: 3, openViolations: 0, avgRent: "$2,400",
-    reviewList: [
-      { author: "Destiny F.", date: "2026-03-10", stars: 5, text: "Marcus is the best landlord I've ever had. Building is spotless, super allows dogs." },
-      { author: "Leo C.", date: "2026-02-02", stars: 5, text: "Responsive, fair, and honest. Renewed my lease with no increase." },
-      { author: "Nina P.", date: "2025-10-15", stars: 4, text: "Love living here. Only minor issue is laundry room hours." }
-    ]
-  },
-  {
-    id: 4, name: "Apex Urban Holdings", owner: "Vincent Moretti",
-    borough: "Manhattan", address: "88 Delancey St", zip: "10002",
-    properties: 41, units: 520, rating: 1.8, reviews: 203,
-    tags: ["unresponsive", "violation-heavy", "rent-disputes"],
-    phone: "(212) 555-0488", email: "leasing@apexurban.com", registered: "2003",
-    violations: 187, openViolations: 34, avgRent: "$3,200",
-    reviewList: [
-      { author: "Carlos G.", date: "2026-03-15", stars: 1, text: "Worst landlord in NYC. Ignored a gas leak for 2 weeks. Had to call 311 myself." },
-      { author: "Emily S.", date: "2026-02-20", stars: 1, text: "Tried to charge me for repairs that were their responsibility. Avoid at all costs." },
-      { author: "David R.", date: "2026-01-10", stars: 3, text: "Location is great but management is terrible. You get what you pay for." }
-    ]
-  },
-  {
-    id: 5, name: "Astoria Living Co.", owner: "Elena Papadopoulos",
-    borough: "Queens", address: "31-15 Ditmars Blvd", zip: "11105",
-    properties: 11, units: 88, rating: 4.5, reviews: 56,
-    tags: ["responsive", "community-oriented", "well-maintained"],
-    phone: "(718) 555-0523", email: "elena@astorialiving.com", registered: "2010",
-    violations: 7, openViolations: 1, avgRent: "$1,950",
-    reviewList: [
-      { author: "Yuki T.", date: "2026-02-28", stars: 5, text: "Elena knows every tenant by name. Building events during holidays. Feels like home." },
-      { author: "Andre B.", date: "2026-01-14", stars: 4, text: "Clean building, fair rent, good location. Recommended." },
-      { author: "Maria S.", date: "2025-11-30", stars: 5, text: "Best managed building I've lived in. Super is on-site and always helpful." }
-    ]
-  },
-  {
-    id: 6, name: "Grand Concourse Partners", owner: "Robert Diaz",
-    borough: "Bronx", address: "1500 Grand Concourse", zip: "10457",
-    properties: 19, units: 245, rating: 2.4, reviews: 98,
-    tags: ["slow-repairs", "violation-heavy", "affordable"],
-    phone: "(718) 555-0612", email: "info@gcpartners.com", registered: "2006",
-    violations: 92, openViolations: 15, avgRent: "$1,450",
-    reviewList: [
-      { author: "Jasmine W.", date: "2026-03-05", stars: 2, text: "Heat goes out every winter. They take forever to fix it." },
-      { author: "Kevin M.", date: "2026-01-22", stars: 3, text: "Rent is cheap but the building needs work. Elevator breaks often." },
-      { author: "Rosa L.", date: "2025-12-12", stars: 2, text: "Filed complaints with HPD. Management doesn't care about tenants." }
-    ]
-  },
-  {
-    id: 7, name: "Harbor View Estates", owner: "Patricia Chen",
-    borough: "Staten Island", address: "100 Stuyvesant Pl", zip: "10301",
-    properties: 6, units: 42, rating: 4.0, reviews: 28,
-    tags: ["responsive", "quiet-area"],
-    phone: "(718) 555-0744", email: "pat@harborviewsi.com", registered: "2014",
-    violations: 5, openViolations: 0, avgRent: "$1,700",
-    reviewList: [
-      { author: "Brian T.", date: "2026-02-10", stars: 4, text: "Quiet building, good parking. Patricia is responsive to issues." },
-      { author: "Linda H.", date: "2025-12-28", stars: 4, text: "Well-maintained property. A bit far from the ferry but worth it for the price." },
-      { author: "Steve O.", date: "2025-11-05", stars: 4, text: "No complaints. Everything works as expected." }
-    ]
-  },
-  {
-    id: 8, name: "Metropolitan Dwellings Inc.", owner: "Jonathan Blake",
-    borough: "Manhattan", address: "225 E 95th St", zip: "10128",
-    properties: 34, units: 410, rating: 3.5, reviews: 145,
-    tags: ["mixed-reviews", "large-portfolio"],
-    phone: "(212) 555-0899", email: "leasing@metrodwell.com", registered: "2001",
-    violations: 56, openViolations: 9, avgRent: "$3,500",
-    reviewList: [
-      { author: "Anna F.", date: "2026-03-12", stars: 4, text: "UES location is unbeatable. Building staff is friendly. Some noise issues." },
-      { author: "Derek J.", date: "2026-02-05", stars: 3, text: "Management company is corporate and impersonal but they do fix things eventually." },
-      { author: "Samantha K.", date: "2025-10-20", stars: 3, text: "Overpriced for what you get. Gym is nice though." }
-    ]
-  },
-  {
-    id: 9, name: "Flatbush Family Properties", owner: "Claudette Bernard",
-    borough: "Brooklyn", address: "2100 Flatbush Ave", zip: "11234",
-    properties: 5, units: 36, rating: 4.8, reviews: 31,
-    tags: ["responsive", "family-friendly", "well-maintained", "affordable"],
-    phone: "(718) 555-0955", email: "claudette@flatbushfam.com", registered: "2017",
-    violations: 1, openViolations: 0, avgRent: "$1,800",
-    reviewList: [
-      { author: "Michelle A.", date: "2026-03-18", stars: 5, text: "Claudette treats tenants like family. Best landlord experience ever." },
-      { author: "Omar H.", date: "2026-02-15", stars: 5, text: "Repairs done same day. Rent is fair. Kids love the backyard." },
-      { author: "Grace P.", date: "2026-01-08", stars: 5, text: "Moving here was the best decision. Safe, clean, and welcoming." }
-    ]
-  },
-  {
-    id: 10, name: "Jackson Heights Mgmt Corp", owner: "Raj Patel",
-    borough: "Queens", address: "75-20 Roosevelt Ave", zip: "11372",
-    properties: 14, units: 175, rating: 3.8, reviews: 67,
-    tags: ["responsive", "diverse-community"],
-    phone: "(718) 555-1077", email: "raj@jhmcorp.com", registered: "2009",
-    violations: 18, openViolations: 3, avgRent: "$1,750",
-    reviewList: [
-      { author: "Fatima Z.", date: "2026-02-22", stars: 4, text: "Raj is approachable and fair. Building is well-located near the subway." },
-      { author: "Chris L.", date: "2026-01-30", stars: 4, text: "Good value for Queens. Maintenance is prompt. Would recommend." },
-      { author: "Sonia D.", date: "2025-12-18", stars: 3, text: "Building is a bit dated but management is trying. New paint in hallways." }
-    ]
-  },
-  {
-    id: 11, name: "Mott Haven Holdings", owner: "Angela Ruiz",
-    borough: "Bronx", address: "350 E 140th St", zip: "10454",
-    properties: 9, units: 112, rating: 3.3, reviews: 53,
-    tags: ["improving", "affordable", "new-management"],
-    phone: "(718) 555-1133", email: "angela@motthaven.nyc", registered: "2019",
-    violations: 28, openViolations: 5, avgRent: "$1,350",
-    reviewList: [
-      { author: "Dante M.", date: "2026-03-08", stars: 4, text: "New management is much better than before. They're actually fixing things." },
-      { author: "Lisa V.", date: "2026-01-25", stars: 3, text: "Still some issues from the old owners but trending in the right direction." },
-      { author: "Juan C.", date: "2025-11-10", stars: 3, text: "Affordable and close to the 6 train. Building needs cosmetic work." }
-    ]
-  },
-  {
-    id: 12, name: "Williamsburg Loft Co.", owner: "Tyler Bennett",
-    borough: "Brooklyn", address: "55 N 3rd St", zip: "11249",
-    properties: 7, units: 85, rating: 2.9, reviews: 110,
-    tags: ["overpriced", "trendy-area", "slow-repairs"],
-    phone: "(718) 555-1299", email: "tyler@wburglofts.com", registered: "2013",
-    violations: 33, openViolations: 7, avgRent: "$3,100",
-    reviewList: [
-      { author: "Zoe R.", date: "2026-03-20", stars: 2, text: "Paying $3k for an apartment where the dishwasher hasn't worked in months." },
-      { author: "Max P.", date: "2026-02-08", stars: 3, text: "Location is everything here. The loft is cool but management is lackluster." },
-      { author: "Jen T.", date: "2025-12-22", stars: 3, text: "Instagram-worthy apartment, subpar landlord. Style over substance." }
-    ]
-  }
-];
+const SUPABASE_URL = 'https://eaevppdtlgyoptsizdpr.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVhZXZwcGR0bGd5b3B0c2l6ZHByIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTAyMDAsImV4cCI6MjA5MDI4NjIwMH0.HqzhLWJvn7e0nRLnKTZvX27Q_q6b3dmimV_3jkYeFaw';
+
+const headers = {
+  'apikey': SUPABASE_KEY,
+  'Authorization': `Bearer ${SUPABASE_KEY}`,
+  'Content-Type': 'application/json',
+  'Prefer': 'return=representation'
+};
+
+let landlords = [];
+
+async function api(path, options = {}) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, { headers, ...options });
+  if (!res.ok) throw new Error(await res.text());
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
+
+async function loadLandlords() {
+  landlords = await api('landlords?order=id.asc');
+  doSearch();
+}
+
+async function loadReviews(landlordId) {
+  return api(`reviews?landlord_id=eq.${landlordId}&order=date.desc`);
+}
 
 function getStars(rating) {
   const full = Math.floor(rating);
@@ -303,17 +244,17 @@ function renderCard(l) {
       <div class="card-name">${l.name}</div>
       <div class="card-rating">
         <span class="stars">${getStars(l.rating)}</span>
-        <span class="rating-num">${l.rating} (${l.reviews})</span>
+        <span class="rating-num">${l.rating} (${l.reviews_count})</span>
       </div>
     </div>
     <div class="card-details">
       <div class="detail"><span class="label">Owner:</span> <span class="value">${l.owner}</span></div>
       <div class="detail"><span class="label">Borough:</span> <span class="value">${l.borough}</span></div>
       <div class="detail"><span class="label">Address:</span> <span class="value">${l.address}</span></div>
-      <div class="detail"><span class="label">Avg Rent:</span> <span class="value">${l.avgRent}</span></div>
+      <div class="detail"><span class="label">Avg Rent:</span> <span class="value">${l.avg_rent}</span></div>
     </div>
     <div class="card-tags">${l.tags.map(t => `<span class="tag ${getTagClass(t)}">${t}</span>`).join('')}</div>
-    <div class="card-properties">Properties: <span>${l.properties}</span> · Units: <span>${l.units}</span> · Violations: <span>${l.openViolations} open</span></div>
+    <div class="card-properties">Properties: <span>${l.properties}</span> · Units: <span>${l.units}</span> · Violations: <span>${l.open_violations} open</span></div>
   </div>`;
 }
 
@@ -344,22 +285,23 @@ function doSearch() {
   }
 }
 
-function openModal(id) {
+async function openModal(id) {
   const l = landlords.find(x => x.id === id);
+  const reviewList = await loadReviews(id);
   document.getElementById('modalContent').innerHTML = `
     <button class="modal-close" onclick="document.getElementById('modal').classList.remove('active')">&times;</button>
     <h2>${l.name}</h2>
-    <div class="modal-rating"><span class="stars">${getStars(l.rating)}</span> <span class="rating-num">${l.rating} / 5 · ${l.reviews} reviews</span></div>
+    <div class="modal-rating"><span class="stars">${getStars(l.rating)}</span> <span class="rating-num">${l.rating} / 5 · ${l.reviews_count} reviews</span></div>
 
     <div class="modal-section">
       <h3>Contact & Info</h3>
       <div class="modal-grid">
         <div class="row"><span class="lbl">Owner</span><span class="val">${l.owner}</span></div>
-        <div class="row"><span class="lbl">Phone</span><span class="val">${l.phone}</span></div>
-        <div class="row"><span class="lbl">Email</span><span class="val">${l.email}</span></div>
+        <div class="row"><span class="lbl">Phone</span><span class="val">${l.phone || '—'}</span></div>
+        <div class="row"><span class="lbl">Email</span><span class="val">${l.email || '—'}</span></div>
         <div class="row"><span class="lbl">Address</span><span class="val">${l.address}, ${l.zip}</span></div>
         <div class="row"><span class="lbl">Borough</span><span class="val">${l.borough}</span></div>
-        <div class="row"><span class="lbl">Registered</span><span class="val">${l.registered}</span></div>
+        <div class="row"><span class="lbl">Registered</span><span class="val">${l.registered || '—'}</span></div>
       </div>
     </div>
 
@@ -368,9 +310,9 @@ function openModal(id) {
       <div class="modal-grid">
         <div class="row"><span class="lbl">Properties</span><span class="val">${l.properties}</span></div>
         <div class="row"><span class="lbl">Total Units</span><span class="val">${l.units}</span></div>
-        <div class="row"><span class="lbl">Avg Rent</span><span class="val">${l.avgRent}</span></div>
+        <div class="row"><span class="lbl">Avg Rent</span><span class="val">${l.avg_rent}</span></div>
         <div class="row"><span class="lbl">Total Violations</span><span class="val">${l.violations}</span></div>
-        <div class="row"><span class="lbl">Open Violations</span><span class="val" style="color:${l.openViolations > 5 ? '#f87171' : '#6ee7b7'}">${l.openViolations}</span></div>
+        <div class="row"><span class="lbl">Open Violations</span><span class="val" style="color:${l.open_violations > 5 ? '#f87171' : '#6ee7b7'}">${l.open_violations}</span></div>
       </div>
     </div>
 
@@ -381,13 +323,18 @@ function openModal(id) {
 
     <div class="modal-section">
       <h3>Recent Reviews</h3>
-      ${l.reviewList.map(r => `<div class="review">
+      ${reviewList.length ? reviewList.map(r => `<div class="review">
         <div class="review-header">
           <span class="review-author">${r.author} <span class="stars" style="font-size:0.8rem">${getStars(r.stars)}</span></span>
           <span class="review-date">${r.date}</span>
         </div>
         <div class="review-text">${r.text}</div>
-      </div>`).join('')}
+      </div>`).join('') : '<p style="color:#64748b">No reviews yet.</p>'}
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-edit" onclick="document.getElementById('modal').classList.remove('active'); openForm(${l.id})">Edit</button>
+      <button class="btn-delete" onclick="deleteLandlord(${l.id})">Delete</button>
     </div>
   `;
   document.getElementById('modal').classList.add('active');
@@ -399,10 +346,102 @@ function closeModal(e) {
   }
 }
 
-document.getElementById('searchInput').addEventListener('input', doSearch);
-document.addEventListener('keydown', e => { if (e.key === 'Escape') document.getElementById('modal').classList.remove('active'); });
+// --- CRUD Form ---
 
-doSearch();
+function openForm(id) {
+  const form = document.getElementById('formModal');
+  document.getElementById('formId').value = '';
+  document.getElementById('formTitle').textContent = 'Add Landlord';
+  document.getElementById('fName').value = '';
+  document.getElementById('fOwner').value = '';
+  document.getElementById('fBorough').value = 'Manhattan';
+  document.getElementById('fAddress').value = '';
+  document.getElementById('fZip').value = '';
+  document.getElementById('fPhone').value = '';
+  document.getElementById('fEmail').value = '';
+  document.getElementById('fProperties').value = '0';
+  document.getElementById('fUnits').value = '0';
+  document.getElementById('fAvgRent').value = '';
+  document.getElementById('fRegistered').value = '';
+  document.getElementById('fTags').value = '';
+
+  if (id) {
+    const l = landlords.find(x => x.id === id);
+    document.getElementById('formTitle').textContent = 'Edit Landlord';
+    document.getElementById('formId').value = l.id;
+    document.getElementById('fName').value = l.name;
+    document.getElementById('fOwner').value = l.owner;
+    document.getElementById('fBorough').value = l.borough;
+    document.getElementById('fAddress').value = l.address;
+    document.getElementById('fZip').value = l.zip;
+    document.getElementById('fPhone').value = l.phone || '';
+    document.getElementById('fEmail').value = l.email || '';
+    document.getElementById('fProperties').value = l.properties;
+    document.getElementById('fUnits').value = l.units;
+    document.getElementById('fAvgRent').value = l.avg_rent || '';
+    document.getElementById('fRegistered').value = l.registered || '';
+    document.getElementById('fTags').value = (l.tags || []).join(', ');
+  }
+
+  form.classList.add('active');
+}
+
+function closeFormModal(e) {
+  if (!e || e.target === document.getElementById('formModal')) {
+    document.getElementById('formModal').classList.remove('active');
+  }
+}
+
+async function saveForm() {
+  const id = document.getElementById('formId').value;
+  const tags = document.getElementById('fTags').value.split(',').map(t => t.trim()).filter(Boolean);
+  const body = {
+    name: document.getElementById('fName').value,
+    owner: document.getElementById('fOwner').value,
+    borough: document.getElementById('fBorough').value,
+    address: document.getElementById('fAddress').value,
+    zip: document.getElementById('fZip').value,
+    phone: document.getElementById('fPhone').value || null,
+    email: document.getElementById('fEmail').value || null,
+    properties: parseInt(document.getElementById('fProperties').value) || 0,
+    units: parseInt(document.getElementById('fUnits').value) || 0,
+    avg_rent: document.getElementById('fAvgRent').value || null,
+    registered: document.getElementById('fRegistered').value || null,
+    tags
+  };
+
+  if (!body.name || !body.owner || !body.address) {
+    alert('Name, owner, and address are required.');
+    return;
+  }
+
+  if (id) {
+    await api(`landlords?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify(body) });
+  } else {
+    await api('landlords', { method: 'POST', body: JSON.stringify(body) });
+  }
+
+  closeFormModal();
+  await loadLandlords();
+}
+
+async function deleteLandlord(id) {
+  if (!confirm('Delete this landlord? This cannot be undone.')) return;
+  await api(`landlords?id=eq.${id}`, { method: 'DELETE' });
+  document.getElementById('modal').classList.remove('active');
+  await loadLandlords();
+}
+
+// --- Init ---
+document.getElementById('searchInput').addEventListener('input', doSearch);
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.getElementById('modal').classList.remove('active');
+    document.getElementById('formModal').classList.remove('active');
+  }
+});
+
+loadLandlords();
 </script>
 </body>
 </html>
